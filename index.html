@@ -108,7 +108,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2017/05/16/hello-world/" data-id="cj7evq7h30000wocewn0xt9zt" class="article-share-link" data-share="baidu" data-title="Hello World">分享到</a>
+        <a data-url="http://yoursite.com/2017/05/16/hello-world/" data-id="cj7hra70y00011kcej0e8vnhu" class="article-share-link" data-share="baidu" data-title="Hello World">分享到</a>
       
 
       
@@ -123,6 +123,117 @@
 
 
   
+    <article id="post-2016-12-12-MTK_PowerManagement" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/12/12/2016-12-12-MTK_PowerManagement/" class="article-date">
+  <time datetime="2016-12-11T16:00:00.000Z" itemprop="datePublished">2016-12-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Android-kernel/">Android kernel</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/12/12/2016-12-12-MTK_PowerManagement/">MTK 电池曲线调试</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://www.eetrend.com/files-eetrend/forum/201601/100061643-73825-25.png" alt="image"></p>
+<p>上图中可以看到在电池曲线调试过程中经常会遇到的两种情况</p>
+<h5 id="1-如上图红色曲线电池实际电量变化快于电量百分比的变化"><a href="#1-如上图红色曲线电池实际电量变化快于电量百分比的变化" class="headerlink" title="1. 如上图红色曲线电池实际电量变化快于电量百分比的变化"></a>1. 如上图红色曲线电池实际电量变化快于电量百分比的变化</h5><blockquote>
+<p>出现这种情况后当电池的电量已经到达关机电压点，而UI的电量百分比还留有很多，此时电源管理算法就会将UI电量百分比强制在短时间下拉直至0%关机，所以才会出现上图红色曲线的急剧下坠的情况。</p>
+</blockquote>
+<ul>
+<li><p>解决办法1：放电曲线的整体平滑性调整。所谓整体调整即通过调整后使得UI百分比的变化速度整体加快使其追上电池电量的下降速度。</p>
+<ul>
+<li>例如：减小<strong>电池总容量</strong>从而使得单位时间内UI百分比的下降速度增加，从而拉平末端的陡峭曲线</li>
+</ul>
+</li>
+<li><p>解决办法2：放电曲线的局部线性调整。通过局部线性调整后使得UI百分比被强制下拉的时间得以推后，拖延了系统的关机时间。</p>
+<ul>
+<li>例如：适当拉低<strong>关机电压</strong>从而使得电池低电放电时间得以延迟，从而使得曲线的平滑下降得以继续延续直至关机电压</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h5 id="2-如上图绿色曲线电量百分比的变化快于电池实际电量变化"><a href="#2-如上图绿色曲线电量百分比的变化快于电池实际电量变化" class="headerlink" title="2. 如上图绿色曲线电量百分比的变化快于电池实际电量变化"></a>2. 如上图绿色曲线电量百分比的变化快于电池实际电量变化</h5><blockquote>
+<p>出现这种情况后当UI的电量百分比已经逼近0% 但是此电池的电量并没有接近与关机电压，所以此时系统会在1%的电量这里持续停留直至电压接近关机电压，系统正常关机。</p>
+</blockquote>
+<ul>
+<li><p>解决办法1：放电曲线的整体平滑性调整。所谓整体调整即通过调整后使得UI百分比的变化速度整体减慢使其接近电池电量的下降速度。</p>
+<ul>
+<li>例如：增加<strong>电池总容量</strong>从而使得单位百分比内UI百分比的下降时间拉长，从而拉平末端的平滑曲线</li>
+</ul>
+</li>
+<li><p>解决办法2：放电曲线的局部线性调整。通过局部线性调整后使得电池电量提前触底。</p>
+<ul>
+<li>例如：适当提高<strong>关机电压</strong>从而使得电池低电放电时间得以缩短，从而使得曲线的下降速率得以延续不会受限于剩下的多余容量而迟迟不会关机。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h5 id="3-放电曲线的S型变化"><a href="#3-放电曲线的S型变化" class="headerlink" title="3. 放电曲线的S型变化"></a>3. 放电曲线的S型变化</h5><blockquote>
+<p>出现这种情况时曲线的数据多半十分粗糙不够精确，所以还请供应商重新测试新的曲线数据</p>
+</blockquote>
+<ul>
+<li>调整方法：可以根据实际放电曲线中折线部分的电压值进行具体情况的调整，由于调整方法过于复杂多变所以此处不予详述，详见具体案例分析。</li>
+</ul>
+<p>不卖关子了还是说吧<br>…</p>
+<p>先上图</p>
+<p><img src="http://ofzwum87x.bkt.clouddn.com/QQ%E6%88%AA%E5%9B%BE20161213111854.jpg" alt="image"></p>
+<p><img src="http://ofzwum87x.bkt.clouddn.com/Screenshot_20100102-032113.png" alt="image"></p>
+<ul>
+<li>这种S型的数据曲线在平时的电池调试中想必也有出现，分析出现这种现象的原因要从以下几个问题来入手</li>
+</ul>
+<h6 id="3-1-电池厂的电池曲线数据是如何生成的"><a href="#3-1-电池厂的电池曲线数据是如何生成的" class="headerlink" title="3.1 电池厂的电池曲线数据是如何生成的"></a>3.1 电池厂的电池曲线数据是如何生成的</h6><ul>
+<li>MTK规定了电池放电的分容方法<br><img src="http://ofzwum87x.bkt.clouddn.com/zcv_QQ%E6%88%AA%E5%9B%BE20161230154548.jpg" alt="image"></li>
+</ul>
+<ul>
+<li>MTK要求建立 zcv table 实际为电池内阻r跟开路电压ocv的对应关系表，然后在开路电压的基础上对应出电量百分比的值dod。</li>
+<li>这些测试出来的参数都是在为在电量的库仑计算法提供数据支持。</li>
+</ul>
+<hr>
+<h6 id="3-2-SW库仑计算法的实质"><a href="#3-2-SW库仑计算法的实质" class="headerlink" title="3.2 SW库仑计算法的实质"></a>3.2 SW库仑计算法的实质</h6><p><img src="http://ofzwum87x.bkt.clouddn.com/sw_fg.png" alt="image"></p>
+<ul>
+<li>总的来说算法将获取到的Vbat电压搭配 MTK Impedance Tracking 方式回推出电池的开路电压，从而推出电池的百分比</li>
+</ul>
+<p>如果希望了解详细的算法过程可以到如下网站进行进一步学习(<br><a href="http://www.eetrend.com/forum/100061643" target="_blank" rel="external">MTK Fuel Gauge算法分析</a>)</p>
+<hr>
+<p>总结：实际上我们看到的电量变化最终是通过积分算法计算出来的，而</p>
+<p>==<strong>电池曲线数据不是为了让电源管理程序表现电池的实际特性，而是根据电池的实际特性来优化系统的充放电体验</strong>==</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://yoursite.com/2016/12/12/2016-12-12-MTK_PowerManagement/" data-id="cj7hra70r00001kce7em0yyir" class="article-share-link" data-share="baidu" data-title="MTK 电池曲线调试">分享到</a>
+      
+
+      
+        <a href="http://yoursite.com/2016/12/12/2016-12-12-MTK_PowerManagement/#ds-thread" class="article-comment-link">评论</a>
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Power-Management/">Power Management</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-2016-11-02-N18_ADC_accuracy_about" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/11/02/2016-11-02-N18_ADC_accuracy_about/" class="article-date">
@@ -130,7 +241,7 @@
 </a>
     
   <div class="article-category">
-    <a class="article-category-link" href="/categories/小系统/">小系统</a>
+    <a class="article-category-link" href="/categories/FreeRTOS/">FreeRTOS</a>
   </div>
 
   </div>
@@ -186,7 +297,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="http://yoursite.com/2016/11/02/2016-11-02-N18_ADC_accuracy_about/" data-id="cj7evq7ha0001wocemwfnfor0" class="article-share-link" data-share="baidu" data-title="单片机LPC电源管理">分享到</a>
+        <a data-url="http://yoursite.com/2016/11/02/2016-11-02-N18_ADC_accuracy_about/" data-id="cj7hra71700041kcelnfngn13" class="article-share-link" data-share="baidu" data-title="单片机LPC电源管理">分享到</a>
       
 
       
@@ -194,6 +305,8 @@
       
 
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Power-Management/">Power Management</a></li></ul>
+
     </footer>
   </div>
   
@@ -210,20 +323,34 @@
   <div class="widget-wrap">
     <h3 class="widget-title">分类</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/小系统/">小系统</a><span class="category-list-count">1</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android-kernel/">Android kernel</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/FreeRTOS/">FreeRTOS</a><span class="category-list-count">1</span></li></ul>
     </div>
   </div>
 
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Power-Management/">Power Management</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Power-Management/" style="font-size: 10px;">Power Management</a>
+    </div>
+  </div>
+
   
     
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -236,6 +363,10 @@
         
           <li>
             <a href="/2017/05/16/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2016/12/12/2016-12-12-MTK_PowerManagement/">MTK 电池曲线调试</a>
           </li>
         
           <li>
